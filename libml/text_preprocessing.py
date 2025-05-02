@@ -1,5 +1,6 @@
 import re
 import nltk
+import pickle
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,6 +13,9 @@ if 'not' in all_stopwords:
     all_stopwords.remove('not')
 
 def preprocess_dataset(dataset, max_features=1420, n_rows=900):
+    """
+    Preprocessing method for the training dataset.
+    """
     corpus=[]
     for i in range(n_rows):
         review = re.sub('[^a-zA-Z]', ' ', dataset['Review'][i])
@@ -26,6 +30,25 @@ def preprocess_dataset(dataset, max_features=1420, n_rows=900):
     X = cv.fit_transform(corpus).toarray()
     y = dataset.iloc[:, -1].values
 
+    # Save the CountVectorizer model for later use during inference
+    bow_path = 'model/c1_BoW_Sentiment_Model.pkl'
+    pickle.dump(cv, open(bow_path, "wb"))
+
     return X, y
 
 
+def preprocess_input(text, vectorizer):
+    """
+    Preprocessing method for the new input text.
+    The same preprocessing steps as in the training dataset are applied using the same count vectorizer model.
+
+    Args:
+        text (str): Input text.
+        vectorizer (CountVectorizer): Fitted count vectorizer model from training.
+    """
+    text = re.sub('[^a-zA-Z]', ' ', text)
+    text = text.lower()
+    text = text.split()
+    text = [ps.stem(word) for word in text if word not in set(all_stopwords)]
+    text = ' '.join(text)
+    return vectorizer.transform([text]).toarray()
