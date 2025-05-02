@@ -1,6 +1,5 @@
 import re
 import nltk
-import pickle
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -35,11 +34,7 @@ def preprocess_dataset(dataset, max_features=1420, n_rows=900):
     X = cv.fit_transform(corpus).toarray()
     y = dataset.iloc[:, -1].values
 
-    # Save the CountVectorizer model for later use during inference
-    bow_path = 'model/c1_BoW_Sentiment_Model.pkl'
-    pickle.dump(cv, open(bow_path, "wb"))
-
-    return X, y
+    return X, y, cv
 
 
 def preprocess_input(text, vectorizer):
