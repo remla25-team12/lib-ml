@@ -15,6 +15,11 @@ if 'not' in all_stopwords:
 def preprocess_dataset(dataset, max_features=1420, n_rows=900):
     """
     Preprocessing method for the training dataset.
+
+    Args:
+        dataset (pd.DataFrame): Training dataset.
+        max_features (int): Maximum number of features to use within the count vectorizer.
+        n_rows (int): Number of reviews to preprocess from the dataset for training.
     """
     corpus=[]
     for i in range(n_rows):
