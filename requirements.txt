@@ -1,2 +1,6 @@
 nltk
 scikit-learn
+setuptools>=64
+setuptools_scm>=8
+build
+twine
