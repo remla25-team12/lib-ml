@@ -11,6 +11,19 @@ all_stopwords = stopwords.words('english')
 if 'not' in all_stopwords:
     all_stopwords.remove('not')
 
+
+def _clean(text):
+    """
+    Private helper method to clean the text data. 
+    """
+    text = re.sub('[^a-zA-Z]', ' ', text)
+    text = text.lower()
+    text = text.split()
+    text = [ps.stem(word) for word in text if word not in set(all_stopwords)]
+    clean_text = ' '.join(text)
+    return clean_text
+
+
 def preprocess_dataset(dataset, max_features=1420, n_rows=900):
     """
     Preprocessing method for the training dataset.
@@ -21,13 +34,9 @@ def preprocess_dataset(dataset, max_features=1420, n_rows=900):
         n_rows (int): Number of reviews to preprocess from the dataset for training.
     """
     corpus=[]
-    for i in range(n_rows):
-        review = re.sub('[^a-zA-Z]', ' ', dataset['Review'][i])
-        review = review.lower()
-        review = review.split()
-        review = [ps.stem(word) for word in review if not word in set(all_stopwords)]
-        review = ' '.join(review)
-        corpus.append(review)
+    for i in range(min(n_rows, len(dataset))):
+        clean_review = _clean(dataset['Review'][i])
+        corpus.append(clean_review)
 
     cv = CountVectorizer(max_features = max_features)
 
@@ -46,9 +55,5 @@ def preprocess_input(text, vectorizer):
         text (str): Input text.
         vectorizer (CountVectorizer): Fitted count vectorizer model from training.
     """
-    text = re.sub('[^a-zA-Z]', ' ', text)
-    text = text.lower()
-    text = text.split()
-    text = [ps.stem(word) for word in text if word not in set(all_stopwords)]
-    text = ' '.join(text)
-    return vectorizer.transform([text]).toarray()
+    clean_text = _clean(text)
+    return vectorizer.transform([clean_text]).toarray()
