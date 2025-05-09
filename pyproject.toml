@@ -11,3 +11,4 @@ dependencies = [
 ]
 
 [tool.setuptools_scm]
+write_to = "libml/_version.py"
